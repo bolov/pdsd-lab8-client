@@ -1,5 +1,17 @@
 package ro.pub.cs.systems.pdsd.lab08.googlecloudmessaging.view;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
+
 import ro.pub.cs.systems.pdsd.lab08.googlecloudmessaging.R;
 import ro.pub.cs.systems.pdsd.lab08.googlecloudmessaging.general.Constants;
 import ro.pub.cs.systems.pdsd.lab08.googlecloudmessaging.general.Utilities;
@@ -8,6 +20,7 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.Settings.NameValueTable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,6 +57,26 @@ public class UnregisteredFragment extends Fragment {
 						// - attach the list of parameters to the HttpPost object
 						// - execute the HttpPost request on the HttpClient and get the HttpResponse
 						// - get the code from the status line of the response and return Constants.SUCCESS in case it is 200
+						
+						HttpClient client = new DefaultHttpClient();
+						
+						
+						List<NameValuePair> params_lst = new ArrayList<NameValuePair>();
+						params_lst.add(new BasicNameValuePair(Constants.USERNAME, usernameEditText.getText().toString()));
+						params_lst.add(new BasicNameValuePair(Constants.EMAIL, emailEditText.getText().toString()));
+						params_lst.add(new BasicNameValuePair(Constants.REGISTRATION_ID, registrationIdTextView.getText().toString()));
+						
+						HttpPost hp = new HttpPost(Constants.DEVICE_REGISTRATION_SERVICE_ADDRESS);
+						
+						UrlEncodedFormEntity enc = new UrlEncodedFormEntity(params_lst, HTTP.UTF_8);
+						hp.setEntity(enc);
+						
+						
+						HttpResponse hr = client.execute(hp);
+						
+						if (hr.getStatusLine().getStatusCode() == 200)
+							return Constants.SUCCESS;
+						
 
 					} catch (Exception exception) {
 						Log.e(Constants.TAG, "An exception has occurred: " + exception.getMessage());
